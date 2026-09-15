@@ -59,6 +59,31 @@ push하면 GitHub Actions(`.github/workflows/verify.yml`)가 같은 명령을
 
 ---
 
+## 2-1. Issue별 종료 조건 검증 (`tests/issues/`)
+
+> 원본: SSOT §0 (Issue-SSOT 규칙), [`.github/ISSUE_TEMPLATE/maintenance.yml`](../../.github/ISSUE_TEMPLATE/maintenance.yml)
+
+INV-1~7은 요구사항·아키텍처(1·2절)에 이미 명시된 불변식만 다룬다. 개별
+유지보수 Issue의 "종료 조건"(Issue Form 3번 항목)은 그 Issue에서만
+확정되는 세부 사항이라 INV 표에는 없다 — 이를 판정하는 테스트는 아래
+규칙으로 별도 작성한다.
+
+```
+tests/issues/issue-{Issue 번호}-{기능명(영문 kebab-case)}.test.ts
+```
+
+- 파일 하나가 그 Issue Form의 3번 항목("조건 → 기대 결과")을 하나씩 그대로 검증한다
+- `vitest.config.ts`의 `include: ['tests/**/*.test.ts']`가 하위 디렉터리까지
+  잡으므로, `tests/issues/`에 파일을 추가하기만 하면 `npm run verify`의
+  `test` 단계에 **별도 설정 없이 자동 포함**된다
+- 종료 조건 자체는 특정 숫자·날짜를 쓰지 않지만(Issue Form §3 가이드), 이
+  테스트 코드 안에서는 그 조건을 만족하는 구체적인 예시 값을 자유롭게 쓴다
+- 기존 INV-1~7과 겹치는 부분이 있으면 `tests/*.test.ts`에도 케이스를
+  추가하되, 이 Issue 전용 판정은 반드시 `tests/issues/`로 분리해 INV 표와
+  섞이지 않게 한다
+
+---
+
 ## 3. architecture 단계가 강제하는 규칙
 
 `scripts/verify-architecture.ts`는 DB 연결 없이 `src/**/*.{ts,tsx}` 소스만
