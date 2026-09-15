@@ -1,0 +1,26 @@
+name: Verify
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    env:
+      # PoC 검증 전용 값 — 운영 비밀값이 아니다 (README/.env.example과 동일한 형태)
+      DATABASE_URL: "file:./prisma/dev.db"
+      SESSION_SECRET: "ci-verify-secret-not-for-production"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run verify
