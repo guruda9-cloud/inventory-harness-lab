@@ -136,7 +136,14 @@ AI는 요구사항·아키텍처·하네스 핵심 규칙·검증 스크립트�
 
 ## 3. 검증
 
-_(추후 작성 예정 — INV-1~7 통과 여부, DoD 재현 결과, QA 체크리스트 결과)_
+> 원본: [`02-verification.md`](02-verification.md)
+
+- **자동**: `npm run verify` 한 줄이 `prepare → typecheck → lint → architecture → test → build` 순서로 돈다. PR·`main` push마다 `.github/workflows/verify.yml`이 동일 명령을 실행한다
+- `verify:prepare`가 로컬 DB를 지우고 같은 시드로 재생성해, 매번 동일한 상태에서 검증이 시작된다 (기존 로컬 조작 상태에 결과가 흔들리지 않음)
+- `test` 단계는 INV-1~7을 `tests/*.test.ts`로 검증한다(§2.6 표와 동일)
+- `architecture` 단계(`scripts/verify-architecture.ts`)는 §2.2(재고 변경 유일 통로)·§7.5(Prisma 서버 전용) 위반을 정적으로 검사해 위반 시 실패한다
+- **수동**: QA 체크리스트(반응형·엣지케이스·페르소나 시나리오)는 자동화 대상이 아니다 — 02 §5 참조
+- 전체 표·CI 세부 설정은 02 참조
 
 ---
 
