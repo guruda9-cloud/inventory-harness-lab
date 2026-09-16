@@ -14,7 +14,7 @@
 | 문서·Issue·계획이 서로 다른 말을 할 때 무엇을 따라야 하는지 | SSOT §0 문서 충돌 시 판단 규칙 |
 | 이 변경을 AI가 직접 결정해도 되는지, 사람 승인이 필요한지 | SSOT §0-1 보호 영역과 소유권 |
 | 테스트·불변식이 실제로 통과했는지, `npm run verify`·CI 구성, QA 결과 | SSOT §3 검증 → [`docs/harness/02-verification.md`](docs/harness/02-verification.md) |
-| 마일스톤 진행 상황, 구현 중 정해진 세부 규칙, 알려진 함정 | SSOT §4 구현 루프 *(현재 비어 있음 → `docs/HANDOVER.md` 확인)* |
+| 구현 루프 시도 횟수·세션 복구(코멘트) 정책, 마일스톤 진행 상황, 알려진 함정 | SSOT §4 구현 루프 → [`docs/harness/03-loop.md`](docs/harness/03-loop.md) · 마일스톤 현황은 `docs/HANDOVER.md` |
 
 ## 탐색 범위 넓히기 (라우팅된 절로 판단이 안 될 때만)
 
