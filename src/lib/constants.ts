@@ -111,6 +111,13 @@ export const POPUP_STATUS_LABEL: Record<PopupStatus, string> = {
   CLOSED: '종료',
 }
 
+export const POPUP_STATUS_TONE: Record<PopupStatus, 'acc' | 'amber' | 'ok' | 'gray'> = {
+  PREP: 'amber',
+  ACTIVE: 'acc',
+  SETTLING: 'amber',
+  CLOSED: 'gray',
+}
+
 export const USER_ROLES = { MEMBER: 'MEMBER', ADMIN: 'ADMIN' } as const
 export type UserRole = (typeof USER_ROLES)[keyof typeof USER_ROLES]
 
