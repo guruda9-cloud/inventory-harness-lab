@@ -79,7 +79,8 @@ export async function getPopupList() {
   return popups.map((p) => ({
     id: p.id,
     name: p.name,
-    status: popupDisplayStatus(p),
+    status: p.status,
+    displayStatus: popupDisplayStatus(p),
     startDate: p.startDate,
     endDate: p.endDate,
     onHand: p.location.lots.reduce((s, l) => s + l.quantity, 0),

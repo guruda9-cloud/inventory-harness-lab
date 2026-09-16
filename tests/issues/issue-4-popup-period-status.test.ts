@@ -109,8 +109,23 @@ describe('Issue #4 — 팝업 기간에 따른 상태 판정', () => {
     const listItem = list.find((p) => p.id === popup.id)
     const detail = await getPopupDetail(popup.id)
 
-    expect(listItem?.status).toBe(POPUP_STATUS.SETTLING)
+    expect(listItem?.displayStatus).toBe(POPUP_STATUS.SETTLING)
     expect(detail?.displayStatus).toBe(POPUP_STATUS.SETTLING)
-    expect(listItem?.status).toBe(detail?.displayStatus)
+    expect(listItem?.displayStatus).toBe(detail?.displayStatus)
+  })
+
+  it('목록 조회는 표시용 상태와 별개로 실제 DB 상태(status)를 그대로 보존한다', async () => {
+    // 반출은 이미 됐지만(ACTIVE) 시작일이 아직 안 된 특이 케이스 — 표시는 준비로
+    // 바뀌어도, 반출 여부를 판단하는 실제 상태 필드는 왜곡되면 안 된다
+    vi.useFakeTimers()
+    vi.setSystemTime(addDays(START, -5))
+
+    const popup = await makePopup({ status: POPUP_STATUS.ACTIVE })
+
+    const list = await getPopupList()
+    const listItem = list.find((p) => p.id === popup.id)
+
+    expect(listItem?.status).toBe(POPUP_STATUS.ACTIVE)
+    expect(listItem?.displayStatus).toBe(POPUP_STATUS.PREP)
   })
 })

@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { Badge } from '@/components/StatusBadge'
 import { getPopupList, popupPeriod } from '@/lib/popup'
-import { POPUP_STATUS, POPUP_STATUS_LABEL, POPUP_STATUS_TONE, type PopupStatus } from '@/lib/constants'
+import { POPUP_STATUS, POPUP_STATUS_LABEL, POPUP_STATUS_TONE } from '@/lib/constants'
 
 export const dynamic = 'force-dynamic'
 
@@ -41,8 +41,8 @@ export default async function PopupsPage() {
               </p>
             </div>
             <div className="flex items-center gap-2">
-              <Badge tone={POPUP_STATUS_TONE[p.status as PopupStatus]}>
-                {POPUP_STATUS_LABEL[p.status as PopupStatus]}
+              <Badge tone={POPUP_STATUS_TONE[p.displayStatus]}>
+                {POPUP_STATUS_LABEL[p.displayStatus]}
               </Badge>
               <span className="text-sub">›</span>
             </div>
