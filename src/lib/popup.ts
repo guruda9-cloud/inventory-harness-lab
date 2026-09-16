@@ -1,7 +1,7 @@
 import type { Prisma } from '@/generated/prisma/client'
 import { db } from './db'
 import { applyMovement, reverseMovement } from './stock'
-import { MOVEMENT_TYPES, POPUP_STATUS, REASON_CODES } from './constants'
+import { MOVEMENT_TYPES, POPUP_STATUS, REASON_CODES, type PopupStatus } from './constants'
 import { dateOnly } from './date'
 
 /**
@@ -27,6 +27,29 @@ type MovementLike = {
 export function liveMovements<T extends MovementLike>(movements: T[]): T[] {
   const reversed = new Set(movements.filter((m) => m.reversalOfId).map((m) => m.reversalOfId!))
   return movements.filter((m) => !m.reversalOfId && !reversed.has(m.id))
+}
+
+/**
+ * 표시용 상태 — DB 상태(`Popup.status`)는 실제 행위(반출·정산)로만 바뀌지만,
+ * 화면에는 팝업 기간(시작·종료일)도 함께 반영해야 한다 (Issue #4).
+ *
+ * `PREP`·`CLOSED`는 행위 기반 상태를 그대로 쓴다 — 반출 전이거나 정산이 끝난
+ * 팝업은 기간과 무관하게 그 상태가 맞다. 반출은 됐지만(`ACTIVE`) 아직 정산 전인
+ * 팝업만 기간을 봐서 재판정한다: 시작 전이면 `PREP`, 종료 후면 `SETTLING`
+ * (요구사항 스키마에 이미 정의된 "정산 중" 상태 — 새 상태를 만들지 않는다).
+ */
+export function popupDisplayStatus(popup: {
+  status: string
+  startDate: Date
+  endDate: Date
+}): PopupStatus {
+  if (popup.status === POPUP_STATUS.CLOSED) return POPUP_STATUS.CLOSED
+  if (popup.status === POPUP_STATUS.PREP) return POPUP_STATUS.PREP
+
+  const now = dateOnly(new Date())
+  if (now < dateOnly(popup.startDate)) return POPUP_STATUS.PREP
+  if (now > dateOnly(popup.endDate)) return POPUP_STATUS.SETTLING
+  return POPUP_STATUS.ACTIVE
 }
 
 export type PopupTotals = { shipped: number; sold: number; sample: number; returned: number }
@@ -56,7 +79,7 @@ export async function getPopupList() {
   return popups.map((p) => ({
     id: p.id,
     name: p.name,
-    status: p.status,
+    status: popupDisplayStatus(p),
     startDate: p.startDate,
     endDate: p.endDate,
     onHand: p.location.lots.reduce((s, l) => s + l.quantity, 0),
@@ -134,6 +157,7 @@ export async function getPopupDetail(popupId: number) {
 
   return {
     popup,
+    displayStatus: popupDisplayStatus(popup),
     totals,
     byProduct: [...byProduct.values()].sort((a, b) => b.shipped - a.shipped || a.name.localeCompare(b.name, 'ko')),
     /** 정산 입력 대상 — 팝업에 남아 있는 로트 (유통기한을 보존해야 복귀 로트가 맞는다) */

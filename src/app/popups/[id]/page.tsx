@@ -5,7 +5,7 @@ import { PopupShipOut, type ShipRow } from '@/components/PopupShipOut'
 import { PopupReport } from '@/components/PopupReport'
 import { UnsettleButton } from '@/components/UnsettleButton'
 import { getPopupDetail, popupPeriod, popupReport } from '@/lib/popup'
-import { POPUP_STATUS, POPUP_STATUS_LABEL, type PopupStatus } from '@/lib/constants'
+import { POPUP_STATUS, POPUP_STATUS_LABEL, POPUP_STATUS_TONE, type PopupStatus } from '@/lib/constants'
 import { formatDate } from '@/lib/date'
 
 export const dynamic = 'force-dynamic'
@@ -15,7 +15,7 @@ export default async function PopupDetailPage({ params }: { params: Promise<{ id
   const detail = await getPopupDetail(Number(id))
   if (!detail) notFound()
 
-  const { popup, totals, byProduct, popupLots, sourceLots, products } = detail
+  const { popup, displayStatus, totals, byProduct, popupLots, sourceLots, products } = detail
   const status = popup.status as PopupStatus
   const closed = status === POPUP_STATUS.CLOSED
   const onHand = popupLots.reduce((s, l) => s + l.quantity, 0)
@@ -26,9 +26,7 @@ export default async function PopupDetailPage({ params }: { params: Promise<{ id
         <Link href="/popups" className="text-[14.5px] font-extrabold">
           ‹ {popup.name}
         </Link>
-        <Badge tone={closed ? 'gray' : status === POPUP_STATUS.PREP ? 'amber' : 'acc'}>
-          {POPUP_STATUS_LABEL[status]}
-        </Badge>
+        <Badge tone={POPUP_STATUS_TONE[displayStatus]}>{POPUP_STATUS_LABEL[displayStatus]}</Badge>
       </header>
       <p className="border-b border-line bg-dim px-4 py-2.5 text-[11.5px] text-[#5b5570] tnum">
         {popupPeriod(popup.startDate, popup.endDate)} · {popup.sourceLocation.name}에서 반출
