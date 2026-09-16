@@ -21,10 +21,23 @@ export const LOCATION_TYPE_LABEL: Record<LocationType, string> = {
   DISPOSAL: '폐기',
 }
 
+/** 즉시 출고 가능 — 외부 요청 없이 바로 출고할 수 있는 거점(자사창고)만 (Issue #7) */
+export const IMMEDIATE_LOCATION_TYPES: LocationType[] = [LOCATION_TYPES.OWN]
+
 /** 가용 재고(지금 출고 가능)에 포함되는 거점 유형 */
 export const AVAILABLE_LOCATION_TYPES: LocationType[] = [
   LOCATION_TYPES.OWN,
   LOCATION_TYPES.FULFILLMENT,
+]
+
+/**
+ * 전체 재고 — 회사가 현재 보유·관리하는 물리 재고(자사창고 + 풀필먼트 + 팝업).
+ * 배송 중·폐기는 가상 거점(01 §1)이라 제외한다 (Issue #7).
+ */
+export const TOTAL_STOCK_LOCATION_TYPES: LocationType[] = [
+  LOCATION_TYPES.OWN,
+  LOCATION_TYPES.FULFILLMENT,
+  LOCATION_TYPES.POPUP,
 ]
 
 // ───────── 이동 유형

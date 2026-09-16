@@ -1,7 +1,13 @@
 import { db } from './db'
 import { addDays, dateOnly, daysUntil, today } from './date'
 import { expiryStatus, type ExpiryStatus } from './expiry'
-import { AVAILABLE_LOCATION_TYPES, LOCATION_TYPES, TRANSIT_DELAY_DAYS } from './constants'
+import {
+  AVAILABLE_LOCATION_TYPES,
+  IMMEDIATE_LOCATION_TYPES,
+  LOCATION_TYPES,
+  TOTAL_STOCK_LOCATION_TYPES,
+  TRANSIT_DELAY_DAYS,
+} from './constants'
 
 /** 재고 목록 한 줄에 필요한 것 (05-design 4.4) */
 export type StockRowData = {
@@ -167,9 +173,13 @@ export async function getProductDetail(productId: number) {
   })
   if (!product) return null
 
-  const available = product.lots
-    .filter((l) => (AVAILABLE_LOCATION_TYPES as string[]).includes(l.location.type))
-    .reduce((s, l) => s + l.quantity, 0)
+  const sumByTypes = (types: readonly string[]) =>
+    product.lots.filter((l) => types.includes(l.location.type)).reduce((s, l) => s + l.quantity, 0)
+
+  // 즉시 출고 가능 ⊂ 가용 재고 ⊂ 전체 재고 (Issue #7)
+  const immediate = sumByTypes(IMMEDIATE_LOCATION_TYPES)
+  const available = sumByTypes(AVAILABLE_LOCATION_TYPES)
+  const total = sumByTypes(TOTAL_STOCK_LOCATION_TYPES)
 
   // 유통기한별로 묶되, 안에 거점별 수량을 반드시 나열한다
   const byExpiry = new Map<
@@ -229,7 +239,7 @@ export async function getProductDetail(productId: number) {
       expiryDate: l.expiryDate,
     }))
 
-  return { product, available, lotCards, locationCards, excluded }
+  return { product, immediate, available, total, lotCards, locationCards, excluded }
 }
 
 // ───────────────────────── 풀필먼트 일일 반영 (S5)

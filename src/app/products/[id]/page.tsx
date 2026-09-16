@@ -20,7 +20,7 @@ export default async function ProductPage({
   const data = await getProductDetail(Number(id))
   if (!data) notFound()
 
-  const { product, available, lotCards, locationCards, excluded } = data
+  const { product, immediate, available, total, lotCards, locationCards, excluded } = data
   const byLocation = view === 'location'
 
   return (
@@ -33,11 +33,19 @@ export default async function ProductPage({
       </header>
 
       <section className="px-4 pb-1 pt-4">
-        <p className="text-[11.5px] text-sub">지금 출고 가능</p>
+        <p className="text-[11.5px] text-sub">즉시 출고 가능 · 자사창고</p>
         <p className="text-[40px] font-extrabold leading-tight tracking-[-0.035em] text-acc tnum">
-          {available}
+          {immediate}
           <span className="ml-1 text-[13px] font-bold text-sub">{product.unit}</span>
         </p>
+        <div className="mt-2 flex items-center gap-4">
+          <span className="flex items-center gap-1.5 text-[11.5px] text-sub">
+            가용 재고 <Qty value={available} unit={product.unit} size="md" />
+          </span>
+          <span className="flex items-center gap-1.5 text-[11.5px] text-sub">
+            전체 재고 <Qty value={total} unit={product.unit} size="md" />
+          </span>
+        </div>
       </section>
 
       <nav className="flex gap-1.5 px-4 pt-2">
